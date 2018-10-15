@@ -20,7 +20,6 @@ String xxValue = "yy";
 int my_led[3] = {0, 2, 1};
 int BNC = 3;
 
-
 void setup()
 {
   // set SPI and a user LED to be outputs
@@ -69,6 +68,10 @@ void loop()
     if (xxValue == "xx") {
       turnLed();
     }
+        //routine
+    if (xxValue == "rr") {
+      turnLedRoutine();
+    }
   }
   if (xxValue == "yy") {
     turnLedLoop();
@@ -92,6 +95,53 @@ void resetFunc() {
   setUpDAC(); // user defined function
   digitalWrite(SS, HIGH); // deselecting the DAC
 }
+
+//just works for led 1
+void turnLedRoutine() {
+  //for para las diferentes intensidades
+  //for para la longitud del pulso
+  //hacerlo un total de 15 veces
+  int times = 5;
+  int pulse_off_long = 1500;
+  int pulse_off_short = 500;
+  
+  int pulse_on[9] = {2000,1000,500,20,10,5,1};
+  int inten[6] = {10,25,50,100};
+  int inten_rep = 4;
+  int pulse_rep = 7;
+  int rest_period = 2000;
+  
+  if (my_led[0]== 1) {
+  //intensies loop
+  digitalWrite(BNC, HIGH);
+  for (int in = 0; in < inten_rep; in++) {
+    if (inten[in] >= 0 or inten[in] <= 100) {
+      power_converted = 3380 - (inten[in] * 26.26);
+    }
+    digitalWrite(SS, LOW);
+    sendAddressAndValue(my_led[2], power_converted);
+    digitalWrite(SS, HIGH);
+    delay(3);
+    //pulse width loop
+//    for (int pw = 0 ; pw < pulse_rep ; pw++) {
+      for (int i = 1; i <= rep_Times; i++) {
+        //first turn ON-LOW
+        //if state is 1 it turns it on/LOW
+        digitalWrite(my_led[1], LOW);
+        //delay(pulse_on[pw]);
+        delay(pulse_width_on);
+        //HIGH means that is off
+        //turns all the LEDs off
+        digitalWrite(my_led[1], HIGH);
+        //delay(pulse_off);  
+        delay(pulse_width_off);
+      }
+      delay(rest_period);
+    }
+    digitalWrite(BNC, LOW);
+    }
+}
+
 
 void turnLed() {
   for (int i = 0; i < rep_Times; i++) {
