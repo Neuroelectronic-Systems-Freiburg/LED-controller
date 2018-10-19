@@ -96,45 +96,66 @@ void turnLedRoutine() {
   //for para las diferentes intensidades
   //for para la longitud del pulso
   //hacerlo un total de 15 veces
-  int times = 5;
+  int rep_long = 5;
+  int rep_short = 10;
   int pulse_off_long = 1500;
   int pulse_off_short = 500;
 
-  int pulse_on[9] = {2000, 1000, 500, 20, 10, 5, 1};
-  int inten[6] = {10, 25, 50, 100};
+  int pulse_on[7] = {2000, 1000, 50, 20, 10, 5, 1};
+  int inten[4] = {10, 25, 50, 100};
+  int pulse_off_routine;
+  int rep_routine;
   int inten_rep = 4;
+  int pulse_rep = 7;
+//  int inten_rep = 2;
+//  int pulse_rep = 2;
   int rest_period = 2000;
+
   if (my_led[0][0] == 1) {
-    //intensies loop
-    digitalWrite(BNC[0], HIGH);
-    for (int in = 0; in < inten_rep; in++) {
-      if (inten[in] >= 0 or inten[in] <= 100) {
-        power_converted = 3380 - (inten[in] * 26.26);
-      }
-      digitalWrite(SS, LOW);
-      sendAddressAndValue(my_led[2][0], power_converted);
-      digitalWrite(SS, HIGH);
-      delay(3);
-      //pulse width loop
-      //    for (int pw = 0 ; pw < pulse_rep ; pw++) {
-      for (int i = 1; i <= rep_Times; i++) {
-        //first turn ON-LOW
-        //if state is 1 it turns it on/LOW
-        digitalWrite(my_led[1][0], LOW);
-        //delay(pulse_on[pw]);
-        delay(pulse_width_on);
-        //HIGH means that is off
-        //turns all the LEDs off
-        digitalWrite(my_led[1][0], HIGH);
-        //delay(pulse_off);
-        delay(pulse_width_off);
-      }
+    for (int puw = 0 ; puw < pulse_rep; puw++) {
+      //BNC signal to generate new file
+      //The MEA detects TTL pulse and generates file, but it has to be switched off again
+      digitalWrite(BNC[0], HIGH);
+      delay(10);
+      digitalWrite(BNC[0], LOW);
       delay(rest_period);
+      //intensies loop
+      for (int in = 0; in < inten_rep; in++) {
+        if (inten[in] >= 0 or inten[in] <= 100) {
+          power_converted = 3380 - (inten[in] * 26.26);
+        }
+        digitalWrite(SS, LOW);
+        sendAddressAndValue(my_led[2][0], power_converted);
+        digitalWrite(SS, HIGH);
+        delay(3);
+        if (pulse_on[puw] <= 50) {
+          pulse_off_routine = pulse_off_short;
+          rep_routine = rep_short;
+        }
+        else {
+          pulse_off_routine = pulse_off_long;
+          rep_routine = rep_long;
+        }
+        //pulse width loop
+        for (int i = 1; i <= rep_routine; i++) {
+          //first turn ON-LOW
+          //if state is 1 it turns it on/LOW
+          digitalWrite(my_led[1][0], LOW);
+          delay(pulse_on[puw]);
+          //delay(pulse_width_on);
+          //HIGH means that is off
+          //turns all the LEDs off
+          digitalWrite(my_led[1][0], HIGH);
+          delay(pulse_off_routine);
+          //delay(pulse_width_off);
+        }
+        delay(rest_period);
+      }
     }
-    digitalWrite(BNC[0], LOW);
+    digitalWrite(BNC[1], HIGH);
+    delay(10);
+    digitalWrite(BNC[1], LOW);
   }
-  //    delay(rest_period);
-  //  }
 }
 
 
